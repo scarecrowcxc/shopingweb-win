@@ -84,6 +84,8 @@ WSGI_APPLICATION = 'gulishop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+AUTH_USER_MODEL = 'users.UserProfile'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
