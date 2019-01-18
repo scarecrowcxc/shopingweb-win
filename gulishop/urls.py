@@ -18,9 +18,15 @@ from django.contrib import admin
 import xadmin
 from django.views.static import serve
 from gulishop.settings import MEDIA_ROOT
+from goods.views import StudentsView, StudentsSingle
 
 urlpatterns = [
     url(r'^media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
     url(r'^xadmin/', xadmin.site.urls),
     url(r'^ueditor/', include('DjangoUeditor.urls')),
+    url(r'^api-auth/', include('rest_framework.urls')),
+
+
+    url(r'^students/$', StudentsView.as_view()),
+    url(r'^students/(\d+)/$', StudentsSingle.as_view())
 ]
