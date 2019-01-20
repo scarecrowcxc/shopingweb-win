@@ -142,3 +142,17 @@ STATICFIELS_DIRS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#放在这里是配置全局的分页
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+
+
+MOBILE_RE = '^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$'
+
+YUNPIAN_KEY = '94e3cafc4543943d7c4de9a2fd687a5f'
+
+
+
