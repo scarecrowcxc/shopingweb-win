@@ -1,94 +1,71 @@
-from django.shortcuts import render, HttpResponse
-from .models import StudentInfo
-from django.views import View
-from django.core import serializers
-import json
 from django.http import JsonResponse
+from django.shortcuts import render, HttpResponse
+from django.views import View
+from .models import Goods
+import json
+from django.forms.models import model_to_dict
+from django.core import serializers
+from .serializers import GoodsSerializer
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 
-# # Create your views here.
-# def student_list(request):
-#     if request.method == "GET":
-#         all_students = StudentInfo.objects.all()
-#         return render(request, 'student_list.html', {
-#             'all_students': all_students
-#         })
-#     else:
-#         #这里处理post请求的逻辑
-#
-#
-# class StudentListView(View):
+# 第一种方式， 自己用python最原始的方式去序列化，但是对于图片序列化的时候， 不支持json序列化
+# class GoodsView(View):
 #     def get(self, request):
-#         all_students = StudentInfo.objects.all()
-#         data = serializers.serialize('json', all_students)
+#         all_goods = Goods.objects.all()
+#         items = []
+#         for goods in all_goods:
+#             item = {}
+#             item['name'] = goods.name
+#             item['shop_price'] = goods.shop_price
+#             # item['goods_front_image'] = goods.goods_front_image
+#             items.append(item)
+        # 使用HttpResponse返回 需要先去把python的json格式类型转化为json的字符串
+        # data = json.dumps(items)
+        # return HttpResponse(data, content_type='application/json')
+
+        # 使用JsonResponse
+        # return JsonResponse(items, safe=False)
+
+# 第二种方式, 使用Django当中封装的model_to _dict方法一次性全部序列化， 但是他只是对我们的第一种方式的简化 并未解决图片序列化不了的问题
+# class  GoodsView(View):
+#     def get(self, request):
+#         all_goods = Goods.objects.all()
+#         items = []
+#         for goods in all_goods:
+#             item = model_to_dict(goods)
+#             items.append(item)
+#         # data = json.dumps(items)
+#         # return HttpResponse(data, content_type='application/json')
+#
+        # return JsonResponse(items, safe=False)
+
+
+# 第三种方式， 使用Django的serializers去做序列化， 它就已经帮我们把图片无法序列化的问题解决了
+# class GoodsView(View):
+#     def get(self, request):
+#         all_goods = Goods.objects.all()
+#         data = serializers.serialize('json', all_goods)
+#
+#         # json.loads()是将Json格式 转成 python格式字典
+#         # 因为JsonResponse()的参数要的是 python格式字典
 #         data = json.loads(data)
-#         return JsonResponse(data)
-#
-#
-# class StudentDetailView(View):
-#     def get(self, request, pk):
-#         if pk:
-#             student = StudentInfo.objects.filter(id=int(pk))
-#             return render(request, 'student_detail.html', {
-#                 'student': student
-#             })
-#
-# class StudentAddView(View):
-#     def post(self, request):
-#         return JsonResponse({'创建好的学生'})
-#
-#
-# class StudentUpdateView(View):
-#     def post(self, request, pk):
-#         return JsonResponse({'修改后的学生'})
-#
-#
-# class StudentDeleteView(View):
-#     def get(self, request, pk):
-#         return JsonResponse({'返回删除成功的状态'})
-#
-#
-
-
-class StudentsView(View):
-    def get(self, request):
-        all_students = StudentInfo.objects.all()
-        data = serializers.serialize('json', all_students)
-        data = json.loads(data)
-        return JsonResponse(data, safe=False, status=200)
-
-    def post(self, request):
-        pass
-        return HttpResponse('添加成功的对象json', status=201)
-
-
-class StudentsSingle(View):
-    def get(self, request, pk):
-        student = StudentInfo.objects.filter(id=int(pk))
-        data = serializers.serialize('json', student)
-        data = json.loads(data)
-        return JsonResponse(data, status=200, safe=False)
-
-    def delete(self, request, pk):
-        StudentInfo.objects.filter(id=int(pk)).delete()
-        return JsonResponse({}, status=204, safe=False)
-
-    def put(self, request, pk):
-        pass
-        return HttpResponse('修改成功的对象json', status=201)
-
-    def patch(self, request, pk):
-        pass
-        return HttpResponse('修改成功的对象json', status=201)
+#         return JsonResponse(data, safe=False)
 
 
 
+######引入Django REST framework ############使用更NB的View
+class GoodsView(APIView):
+   def get(self, request):
 
+       # 拿到要返给前端的数据
+       all_goods = Goods.objects.all()
 
+       # 进行序列化 第一个参数是待序列化的数据，要求queryset类型。 得到一个序列化好后的对象实例
+       serializer = GoodsSerializer(all_goods, many=True)
 
-
-
-
-
+       return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
