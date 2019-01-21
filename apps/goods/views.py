@@ -10,9 +10,9 @@ from .serializers import GoodsSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import generics, mixins
-
-
+from rest_framework import generics, mixins, pagination, filters, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import GoodsFilter
 # 第一种方式， 自己用python最原始的方式去序列化，但是对于图片序列化的时候， 不支持json序列化
 # class GoodsView(View):
 #     def get(self, request):
@@ -73,9 +73,35 @@ from rest_framework import generics, mixins
 #         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
+class GoodsPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_query_param = 'pa'
+    # 下面这个配置上 就可以通过url传参的时候加上 &page_size=数字
+    # 来在browsableAPI改变每页显示的数据数量
+    page_size_query_param = 'page_size'
+
+
+
 class GoodsView(mixins.ListModelMixin, generics.GenericAPIView):
     queryset = Goods.objects.all()
     serializer_class = GoodsSerializer
+    pagination_class = GoodsPagination
+
+    # 配置过滤器
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)  # 元组一个元素也要加个逗号
+    # 指定按照哪一个字段去过滤
+    # filter_fields = ('name', )
+    search_fields = ('name', 'desc', 'goods_brief')
+    ordering_fields = ('shop_price', 'sold_num')
+    filter_class = GoodsFilter
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+
+
+
+
+
+
+
+
