@@ -1,11 +1,11 @@
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 from django.views import View
-from .models import Goods
+from .models import Goods, GoodsCategory
 import json
 from django.forms.models import model_to_dict
 from django.core import serializers
-from .serializers import GoodsSerializer
+from .serializers import GoodsSerializer, CategorySerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +13,11 @@ from rest_framework import status
 from rest_framework import generics, mixins, pagination, filters, viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import GoodsFilter
+
+
+
+
+
 # 第一种方式， 自己用python最原始的方式去序列化，但是对于图片序列化的时候， 不支持json序列化
 # class GoodsView(View):
 #     def get(self, request):
@@ -82,7 +87,25 @@ class GoodsPagination(pagination.PageNumberPagination):
 
 
 
-class GoodsView(mixins.ListModelMixin, generics.GenericAPIView):
+# class GoodsView(mixins.ListModelMixin, generics.GenericAPIView):
+#     queryset = Goods.objects.all()
+#     serializer_class = GoodsSerializer
+#     pagination_class = GoodsPagination
+#
+#     # 配置过滤器
+#     filter_backends = (DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)  # 元组一个元素也要加个逗号
+#     # 指定按照哪一个字段去过滤
+#     # filter_fields = ('name', )
+#     search_fields = ('name', 'desc', 'goods_brief')
+#     ordering_fields = ('shop_price', 'sold_num')
+#     filter_class = GoodsFilter
+#
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+
+
+
+class GoodsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Goods.objects.all()
     serializer_class = GoodsSerializer
     pagination_class = GoodsPagination
@@ -101,7 +124,11 @@ class GoodsView(mixins.ListModelMixin, generics.GenericAPIView):
 
 
 
+class CategoryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    # 有了下面重写的get_queryset()这句就失效了, 或者下面像这样直接filter
+    # queryset = GoodsCategory.objects.all()
+    queryset = GoodsCategory.objects.filter(category_type=1)
+    serializer_class = CategorySerializer
 
-
-
-
+    # def get_queryset(self):
+    #     return GoodsCategory.objects.filter(category_type=1)
