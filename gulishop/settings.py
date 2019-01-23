@@ -46,10 +46,13 @@ INSTALLED_APPS = [
     'crispy_forms',
     'DjangoUeditor',
     'rest_framework',
+    'django_filters',
+    'corsheaders',
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -144,15 +147,19 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #放在这里是配置全局的分页
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+#     'PAGE_SIZE': 10
+# }
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 MOBILE_RE = '^((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[0,3,5-8])|(18[0-9])|166|198|199|(147))\\d{8}$'
 
 YUNPIAN_KEY = '94e3cafc4543943d7c4de9a2fd687a5f'
 
+private_key = os.path.join(BASE_DIR, 'apps/trade/keys/private_key.txt')
 
+ali_key = os.path.join(BASE_DIR, 'apps/trade/keys/ali_key.txt')
 
+appid = 2016092300577371
